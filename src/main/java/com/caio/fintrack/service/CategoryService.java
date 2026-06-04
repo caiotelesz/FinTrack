@@ -2,6 +2,7 @@ package com.caio.fintrack.service;
 
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
+import com.caio.fintrack.exception.ExistsNameException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ public class CategoryService {
 
         Category category = new Category();
         category.setName(request.getNome());
+
+        if(categoryRepository.existsByName(category.getName())) {
+            throw new ExistsNameException("Já existe uma categoria com o nome '" + category.getName() + "'");
+        }
 
         Category savedCategory = categoryRepository.save(category);
 
@@ -48,11 +53,13 @@ public class CategoryService {
 
     public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category id not found"));
 
         category.setName(request.getNome());
 
-        // TODO: Validar nome duplicado depois
+        if(categoryRepository.existsByName(category.getName())) {
+            throw new ExistsNameException("Já existe uma categoria com o nome '" + category.getName() + "'");
+        }
 
         Category savedCategory = categoryRepository.save(category);
 

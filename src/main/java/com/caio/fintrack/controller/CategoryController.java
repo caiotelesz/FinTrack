@@ -2,7 +2,6 @@ package com.caio.fintrack.controller;
 
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
-import com.caio.fintrack.model.Category;
 import com.caio.fintrack.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

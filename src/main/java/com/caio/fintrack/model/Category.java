@@ -13,7 +13,7 @@ public class Category {
     @Column(unique = true, nullable = false, name = "idCategoria")
     private UUID id;
 
-    @Column(unique = true, nullable = false, name = "nome")
+    @Column(nullable = false, name = "nome")
     private String name;
 
     public Category() {}
