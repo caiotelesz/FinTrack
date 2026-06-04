@@ -1,8 +1,13 @@
 package com.caio.fintrack.service;
 
+import com.caio.fintrack.dto.request.CategoryRequestDTO;
+import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -13,10 +18,32 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category saveCategory(Category category) {
+    public CategoryResponseDTO saveCategory(CategoryRequestDTO request) {
 
-        categoryRepository.save(category);
+        Category category = new Category();
+        category.setName(request.getNome());
 
-        return category;
+        Category savedCategory = categoryRepository.save(category);
+
+        return new CategoryResponseDTO(
+            savedCategory.getId(),
+            savedCategory.getName()
+        );
+    }
+
+    public List<CategoryResponseDTO> findAllCategories() {
+
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .map(
+                        category -> new CategoryResponseDTO(
+                                category.getId(),
+                                category.getName()
+                        ))
+                .collect(Collectors.toList()
+                );
+
+
     }
 }
