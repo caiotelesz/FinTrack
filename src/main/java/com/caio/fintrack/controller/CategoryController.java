@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/categorias")
@@ -22,14 +23,24 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> saveCategory(@RequestBody CategoryRequestDTO request) {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(categoryService.saveCategory(request));
     }
 
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
-
-        return ResponseEntity.ok(categoryService.findAllCategories());
+        List<CategoryResponseDTO> response = categoryService.findAllCategories();
+        return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
+            @PathVariable UUID id,
+            @RequestBody CategoryRequestDTO request
+    ) {
+
+        CategoryResponseDTO response = categoryService.updateCategory(id, request);
+        return ResponseEntity.ok(response);
+    }
+
 }

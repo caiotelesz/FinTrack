@@ -7,6 +7,7 @@ import com.caio.fintrack.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +44,21 @@ public class CategoryService {
                         ))
                 .collect(Collectors.toList()
                 );
+    }
 
+    public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO request) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
+        category.setName(request.getNome());
+
+        // TODO: Validar nome duplicado depois
+
+        Category savedCategory = categoryRepository.save(category);
+
+        return new CategoryResponseDTO(
+            savedCategory.getId(),
+            savedCategory.getName()
+        );
     }
 }
