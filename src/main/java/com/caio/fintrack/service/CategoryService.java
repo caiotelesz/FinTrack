@@ -22,7 +22,6 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO saveCategory(CategoryRequestDTO request) {
-
         Category category = new Category();
         category.setName(request.getNome());
 
@@ -39,7 +38,6 @@ public class CategoryService {
     }
 
     public List<CategoryResponseDTO> findAllCategories() {
-
         List<Category> categories = categoryRepository.findAll();
 
         return categories.stream()
@@ -68,5 +66,14 @@ public class CategoryService {
             savedCategory.getId(),
             savedCategory.getName()
         );
+    }
+
+    public void deleteCategory(UUID id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(CategoryIdNotFound::new);
+
+        // TODO: Validar a validação se existe ou não uma transação na categoria
+
+        categoryRepository.delete(category);
     }
 }
