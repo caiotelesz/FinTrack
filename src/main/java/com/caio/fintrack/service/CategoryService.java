@@ -2,6 +2,7 @@ package com.caio.fintrack.service;
 
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
+import com.caio.fintrack.exception.CategoryIdNotFound;
 import com.caio.fintrack.exception.ExistsNameException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
@@ -26,7 +27,7 @@ public class CategoryService {
         category.setName(request.getNome());
 
         if(categoryRepository.existsByName(category.getName())) {
-            throw new ExistsNameException("Já existe uma categoria com o nome '" + category.getName() + "'");
+            throw new ExistsNameException(category.getName());
         }
 
         Category savedCategory = categoryRepository.save(category);
@@ -53,12 +54,12 @@ public class CategoryService {
 
     public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category id not found"));
+                .orElseThrow(CategoryIdNotFound::new);
 
         category.setName(request.getNome());
 
         if(categoryRepository.existsByName(category.getName())) {
-            throw new ExistsNameException("Já existe uma categoria com o nome '" + category.getName() + "'");
+            throw new ExistsNameException(category.getName());
         }
 
         Category savedCategory = categoryRepository.save(category);
