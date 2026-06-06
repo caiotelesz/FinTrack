@@ -1,8 +1,8 @@
 package com.caio.fintrack.exception.globalException;
 
 import com.caio.fintrack.exception.CategoryIdNotFoundException;
-import com.caio.fintrack.exception.ExistsNameException;
-import com.caio.fintrack.exception.TransactionNotValidException;
+import com.caio.fintrack.exception.CategoryAlreadyExistsException;
+import com.caio.fintrack.exception.InvalidTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,8 +12,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ExistsNameException.class)
-    private ResponseEntity<RestErrorMessage> existsNameException(ExistsNameException exception) {
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    private ResponseEntity<RestErrorMessage> existsNameException(CategoryAlreadyExistsException exception) {
         RestErrorMessage threatResponse = new RestErrorMessage(
                 "Conflito de dados",
                 HttpStatus.CONFLICT.value(),
@@ -31,8 +31,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(threatResponse);
     }
 
-    @ExceptionHandler(TransactionNotValidException.class)
-    private ResponseEntity<RestErrorMessage> transactionNotValidException(TransactionNotValidException exception) {
+    @ExceptionHandler(InvalidTransactionException.class)
+    private ResponseEntity<RestErrorMessage> transactionNotValidException(InvalidTransactionException exception) {
         RestErrorMessage threatResponse = new RestErrorMessage(
                 "Dados inválidos",
                 HttpStatus.BAD_REQUEST.value(),

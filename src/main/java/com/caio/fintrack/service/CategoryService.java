@@ -3,7 +3,7 @@ package com.caio.fintrack.service;
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.exception.CategoryIdNotFoundException;
-import com.caio.fintrack.exception.ExistsNameException;
+import com.caio.fintrack.exception.CategoryAlreadyExistsException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class CategoryService {
         category.setName(request.getNome());
 
         if(categoryRepository.existsByName(category.getName())) {
-            throw new ExistsNameException(category.getName());
+            throw new CategoryAlreadyExistsException(category.getName());
         }
 
         Category savedCategory = categoryRepository.save(category);
@@ -57,7 +57,7 @@ public class CategoryService {
         category.setName(request.getNome());
 
         if(categoryRepository.existsByName(category.getName())) {
-            throw new ExistsNameException(category.getName());
+            throw new CategoryAlreadyExistsException(category.getName());
         }
 
         Category savedCategory = categoryRepository.save(category);

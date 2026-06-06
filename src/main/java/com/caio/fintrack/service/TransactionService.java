@@ -5,7 +5,7 @@ import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
 import com.caio.fintrack.exception.CategoryIdNotFoundException;
-import com.caio.fintrack.exception.TransactionNotValidException;
+import com.caio.fintrack.exception.InvalidTransactionException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.model.Transaction;
 import com.caio.fintrack.model.enums.TransactionType;
@@ -13,6 +13,7 @@ import com.caio.fintrack.repository.CategoryRepository;
 import com.caio.fintrack.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,11 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         if(request.getValor() == null || request.getValor() <= 0) {
-            throw new TransactionNotValidException();
+            throw new InvalidTransactionException("O campo 'valor' deve ser maior que zero.");
+        }
+
+        if(request.getData() == null || request.getData().isAfter(LocalDate.now())) {
+            throw new InvalidTransactionException("O campo data não pode ser uma data futura.");
         }
 
         transaction.setType(TransactionType.ENTRADA);
@@ -61,7 +66,11 @@ public class TransactionService {
                 .orElseThrow(CategoryIdNotFoundException::new);
 
         if(request.getValor() == null || request.getValor() <= 0) {
-            throw new TransactionNotValidException();
+            throw new InvalidTransactionException("O campo 'valor' deve ser maior que zero.");
+        }
+
+        if(request.getData() == null || request.getData().isAfter(LocalDate.now())) {
+            throw new InvalidTransactionException("O campo data não pode ser uma data futura.");
         }
 
         transaction.setType(TransactionType.SAIDA);
@@ -98,9 +107,20 @@ public class TransactionService {
                                 transaction.getAmount(),
                                 transaction.getDate(),
                                 transaction.getDescription(),
-                                null,
+                                toCategoryResponseDTO(transaction.getCategory()),
                                 transaction.getCreatedDate()
                         )
                 ).collect(Collectors.toList());
+    }
+
+    private CategoryResponseDTO toCategoryResponseDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
+
+        return new CategoryResponseDTO(
+                category.getId(),
+                category.getName()
+        );
     }
 }
