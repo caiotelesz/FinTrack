@@ -1,6 +1,5 @@
 package com.caio.fintrack.dto.response;
 
-import com.caio.fintrack.model.Category;
 import com.caio.fintrack.model.enums.TransactionType;
 
 import java.time.LocalDate;
@@ -67,11 +66,11 @@ public class TransactionResponseDTO {
         this.descricao = descricao;
     }
 
-    public CategoryResponseDTO getcategoria() {
+    public CategoryResponseDTO getCategoria() {
         return categoria;
     }
 
-    public void setcategoria(CategoryResponseDTO categoria) {
+    public void setCategoria(CategoryResponseDTO categoria) {
         this.categoria = categoria;
     }
 

@@ -1,5 +1,6 @@
 package com.caio.fintrack.controller;
 
+import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
 import com.caio.fintrack.service.TransactionService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/v1/transacoes/entradas")
+@RequestMapping("/v1/transacoes")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -23,10 +24,16 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @PostMapping
+    @PostMapping("/entradas")
     public ResponseEntity<TransactionResponseDTO> createTransaction(@RequestBody TransactionRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(transactionService.saveTransaction(request));
+                .body(transactionService.saveIncomeTransaction(request));
+    }
+
+    @PostMapping("/saidas")
+    public ResponseEntity<TransactionResponseDTO> saveTransaction(@RequestBody ExpenseTransactionRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(transactionService.saveExpenseTransaction(request));
     }
 
     @GetMapping
