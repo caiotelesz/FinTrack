@@ -8,6 +8,9 @@ import com.caio.fintrack.repository.CategoryRepository;
 import com.caio.fintrack.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TransactionService {
 
@@ -43,5 +46,23 @@ public class TransactionService {
                 null,
                 savedTransaction.getCreatedDate()
         );
+    }
+
+    public List<TransactionResponseDTO> findAllTransactions() {
+
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        return transactions.stream()
+                .map(
+                        transaction -> new TransactionResponseDTO(
+                                transaction.getId(),
+                                transaction.getType(),
+                                transaction.getAmount(),
+                                transaction.getDate(),
+                                transaction.getDescription(),
+                                null,
+                                transaction.getCreatedDate()
+                        )
+                ).collect(Collectors.toList());
     }
 }

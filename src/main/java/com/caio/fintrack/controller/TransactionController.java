@@ -6,9 +6,12 @@ import com.caio.fintrack.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/v1/transacoes/entradas")
@@ -24,5 +27,11 @@ public class TransactionController {
     public ResponseEntity<TransactionResponseDTO> createTransaction(@RequestBody TransactionRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(transactionService.saveTransaction(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
+        List<TransactionResponseDTO> response = transactionService.findAllTransactions();
+        return ResponseEntity.ok(response);
     }
 }
