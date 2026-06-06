@@ -4,6 +4,8 @@ import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
+import com.caio.fintrack.exception.CategoryIdNotFoundException;
+import com.caio.fintrack.exception.TransactionNotValidException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.model.Transaction;
 import com.caio.fintrack.model.enums.TransactionType;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 public class TransactionService {
 
     private final CategoryRepository categoryRepository;
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
         this.transactionRepository = transactionRepository;
@@ -29,8 +31,8 @@ public class TransactionService {
 
         Transaction transaction = new Transaction();
 
-        if(request.getValor() == null || request.getValor() < 0) {
-            throw new RuntimeException("O campo 'valor' deve ser maior que zero.");
+        if(request.getValor() == null || request.getValor() <= 0) {
+            throw new TransactionNotValidException();
         }
 
         transaction.setType(TransactionType.ENTRADA);
@@ -56,10 +58,10 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         Category category = categoryRepository.findById(request.getIdCategoria())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada."));
+                .orElseThrow(CategoryIdNotFoundException::new);
 
-        if(request.getValor() == null || request.getValor() < 0) {
-            throw new RuntimeException("O campo 'valor' deve ser maior que zero.");
+        if(request.getValor() == null || request.getValor() <= 0) {
+            throw new TransactionNotValidException();
         }
 
         transaction.setType(TransactionType.SAIDA);

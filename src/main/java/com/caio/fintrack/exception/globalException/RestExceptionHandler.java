@@ -1,7 +1,8 @@
 package com.caio.fintrack.exception.globalException;
 
-import com.caio.fintrack.exception.CategoryIdNotFound;
+import com.caio.fintrack.exception.CategoryIdNotFoundException;
 import com.caio.fintrack.exception.ExistsNameException;
+import com.caio.fintrack.exception.TransactionNotValidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,13 +21,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(threatResponse);
     }
 
-    @ExceptionHandler(CategoryIdNotFound.class)
-    private ResponseEntity<RestErrorMessage> categoryIdNotFound(CategoryIdNotFound exception) {
+    @ExceptionHandler(CategoryIdNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> categoryIdNotFoundException(CategoryIdNotFoundException exception) {
         RestErrorMessage threatResponse = new RestErrorMessage(
                 "Recurso não encontrado",
                 HttpStatus.NOT_FOUND.value(),
                 exception.getMessage()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(threatResponse);
+    }
+
+    @ExceptionHandler(TransactionNotValidException.class)
+    private ResponseEntity<RestErrorMessage> transactionNotValidException(TransactionNotValidException exception) {
+        RestErrorMessage threatResponse = new RestErrorMessage(
+                "Dados inválidos",
+                HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(threatResponse);
     }
 }

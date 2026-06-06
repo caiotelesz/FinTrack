@@ -2,7 +2,7 @@ package com.caio.fintrack.service;
 
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
-import com.caio.fintrack.exception.CategoryIdNotFound;
+import com.caio.fintrack.exception.CategoryIdNotFoundException;
 import com.caio.fintrack.exception.ExistsNameException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
@@ -52,7 +52,7 @@ public class CategoryService {
 
     public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(CategoryIdNotFound::new);
+                .orElseThrow(CategoryIdNotFoundException::new);
 
         category.setName(request.getNome());
 
@@ -70,7 +70,7 @@ public class CategoryService {
 
     public void deleteCategory(UUID id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(CategoryIdNotFound::new);
+                .orElseThrow(CategoryIdNotFoundException::new);
 
         // TODO: Validar a validação se existe ou não uma transação na categoria
 
