@@ -3,6 +3,7 @@ package com.caio.fintrack.controller;
 import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
+import com.caio.fintrack.model.enums.TransactionType;
 import com.caio.fintrack.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,18 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
         List<TransactionResponseDTO> response = transactionService.findAllTransactions();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/entradas")
+    public ResponseEntity<List<TransactionResponseDTO>> getIncomeTransactions() {
+        List<TransactionResponseDTO> response = transactionService.findTypeTransactions(TransactionType.ENTRADA);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/saidas")
+    public ResponseEntity<List<TransactionResponseDTO>> getExpenseTransactions() {
+        List<TransactionResponseDTO> response = transactionService.findTypeTransactions(TransactionType.SAIDA);
         return ResponseEntity.ok(response);
     }
 }

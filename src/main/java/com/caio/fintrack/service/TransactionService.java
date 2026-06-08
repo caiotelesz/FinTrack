@@ -113,6 +113,23 @@ public class TransactionService {
                 ).collect(Collectors.toList());
     }
 
+    public List<TransactionResponseDTO> findTypeTransactions(TransactionType type) {
+        return transactionRepository.findByType(type)
+                .stream()
+                .map(
+                        transaction -> new TransactionResponseDTO(
+                                transaction.getId(),
+                                transaction.getType(),
+                                transaction.getAmount(),
+                                transaction.getDate(),
+                                transaction.getDescription(),
+                                toCategoryResponseDTO(transaction.getCategory()),
+                                transaction.getCreatedDate()
+                        )
+                )
+                .toList();
+    }
+
     private CategoryResponseDTO toCategoryResponseDTO(Category category) {
         if (category == null) {
             return null;
