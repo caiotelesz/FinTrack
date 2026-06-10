@@ -4,7 +4,7 @@ import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
-import com.caio.fintrack.exception.CategoryIdNotFoundException;
+import com.caio.fintrack.exception.IdNotFoundException;
 import com.caio.fintrack.exception.InvalidTransactionException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.model.Transaction;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +64,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         Category category = categoryRepository.findById(request.getIdCategoria())
-                .orElseThrow(CategoryIdNotFoundException::new);
+                .orElseThrow(IdNotFoundException::new);
 
         if(request.getValor() == null || request.getValor() <= 0) {
             throw new InvalidTransactionException("O campo 'valor' deve ser maior que zero.");
@@ -128,6 +129,12 @@ public class TransactionService {
                         )
                 )
                 .toList();
+    }
+
+    public void deleteTransactions(UUID id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(IdNotFoundException::new);
+
+        transactionRepository.delete(transaction);
     }
 
     private CategoryResponseDTO toCategoryResponseDTO(Category category) {

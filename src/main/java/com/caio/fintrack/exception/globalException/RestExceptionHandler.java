@@ -1,6 +1,6 @@
 package com.caio.fintrack.exception.globalException;
 
-import com.caio.fintrack.exception.CategoryIdNotFoundException;
+import com.caio.fintrack.exception.IdNotFoundException;
 import com.caio.fintrack.exception.CategoryAlreadyExistsException;
 import com.caio.fintrack.exception.InvalidTransactionException;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(threatResponse);
     }
 
-    @ExceptionHandler(CategoryIdNotFoundException.class)
-    private ResponseEntity<RestErrorMessage> categoryIdNotFoundException(CategoryIdNotFoundException exception) {
+    @ExceptionHandler(IdNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> categoryIdNotFoundException(IdNotFoundException exception) {
         RestErrorMessage threatResponse = new RestErrorMessage(
                 "Recurso não encontrado",
                 HttpStatus.NOT_FOUND.value(),
