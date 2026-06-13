@@ -1,6 +1,7 @@
 package com.caio.fintrack.service;
 
 import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
+import com.caio.fintrack.dto.request.TransactionPatchDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
@@ -131,8 +132,57 @@ public class TransactionService {
                 .toList();
     }
 
+    public TransactionResponseDTO updateTransaction(UUID id, TransactionPatchDTO request) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(IdNotFoundException::new);
+
+        if (request.getValor() != null) {
+            if (request.getValor() <= 0) {
+                throw new InvalidTransactionException("O campo 'valor' deve ser maior que zero.");
+            }
+
+            transaction.setAmount(request.getValor());
+        }
+
+        if (request.getData() != null) {
+            if (request.getData().isAfter(LocalDate.now())) {
+                throw new InvalidTransactionException("O campo data não pode ser uma data futura.");
+            }
+
+            transaction.setDate(request.getData());
+        }
+
+        if (request.getDescricao() != null) {
+            transaction.setDescription(request.getDescricao());
+        }
+
+        if (request.getIdCategoria() != null) {
+            if (transaction.getType() == TransactionType.ENTRADA) {
+                throw new InvalidTransactionException("Transações de entrada não possuem categoria.");
+            }
+
+            Category category = categoryRepository.findById(request.getIdCategoria())
+                    .orElseThrow(IdNotFoundException::new);
+
+            transaction.setCategory(category);
+        }
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return new TransactionResponseDTO(
+                savedTransaction.getId(),
+                savedTransaction.getType(),
+                savedTransaction.getAmount(),
+                savedTransaction.getDate(),
+                savedTransaction.getDescription(),
+                toCategoryResponseDTO(savedTransaction.getCategory()),
+                savedTransaction.getCreatedDate()
+        );
+    }
+
     public void deleteTransactions(UUID id) {
-        Transaction transaction = transactionRepository.findById(id).orElseThrow(IdNotFoundException::new);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(IdNotFoundException::new);
 
         transactionRepository.delete(transaction);
     }

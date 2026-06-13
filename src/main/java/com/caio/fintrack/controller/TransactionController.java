@@ -1,6 +1,7 @@
 package com.caio.fintrack.controller;
 
 import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
+import com.caio.fintrack.dto.request.TransactionPatchDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
 import com.caio.fintrack.model.enums.TransactionType;
@@ -50,6 +51,15 @@ public class TransactionController {
     @GetMapping("/saidas")
     public ResponseEntity<List<TransactionResponseDTO>> getExpenseTransactions() {
         List<TransactionResponseDTO> response = transactionService.findTypeTransactions(TransactionType.SAIDA);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TransactionResponseDTO> updateTransaction(
+            @PathVariable UUID id,
+            @RequestBody TransactionPatchDTO request
+    ) {
+        TransactionResponseDTO response = transactionService.updateTransaction(id, request);
         return ResponseEntity.ok(response);
     }
 
