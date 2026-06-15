@@ -1,5 +1,6 @@
 package com.caio.fintrack.exception.globalException;
 
+import com.caio.fintrack.exception.CategoryHasTransactionsException;
 import com.caio.fintrack.exception.IdNotFoundException;
 import com.caio.fintrack.exception.CategoryAlreadyExistsException;
 import com.caio.fintrack.exception.InvalidTransactionException;
@@ -39,5 +40,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 exception.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(threatResponse);
+    }
+
+    @ExceptionHandler(CategoryHasTransactionsException.class)
+    private ResponseEntity<RestErrorMessage> categoryHasTransactionsException(CategoryHasTransactionsException exception) {
+        RestErrorMessage threatResponse = new RestErrorMessage(
+                "Conflito de dados",
+                HttpStatus.CONFLICT.value(),
+                exception.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(threatResponse);
     }
 }

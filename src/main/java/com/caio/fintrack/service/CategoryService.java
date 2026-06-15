@@ -2,10 +2,12 @@ package com.caio.fintrack.service;
 
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
+import com.caio.fintrack.exception.CategoryHasTransactionsException;
 import com.caio.fintrack.exception.IdNotFoundException;
 import com.caio.fintrack.exception.CategoryAlreadyExistsException;
 import com.caio.fintrack.model.Category;
 import com.caio.fintrack.repository.CategoryRepository;
+import com.caio.fintrack.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +18,11 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, TransactionRepository transactionRepository) {
         this.categoryRepository = categoryRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public CategoryResponseDTO saveCategory(CategoryRequestDTO request) {
@@ -54,11 +58,11 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
 
-        category.setName(request.getNome());
-
         if(categoryRepository.existsByName(category.getName())) {
             throw new CategoryAlreadyExistsException(category.getName());
         }
+
+        category.setName(request.getNome());
 
         Category savedCategory = categoryRepository.save(category);
 
@@ -72,7 +76,9 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
 
-        // TODO: Validar a validação se existe ou não uma transação na categoria
+        if(transactionRepository.existsByCategoryId(id)) {
+            throw new CategoryHasTransactionsException();
+        }
 
         categoryRepository.delete(category);
     }
