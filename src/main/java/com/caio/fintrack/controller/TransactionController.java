@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,9 +38,15 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
-        List<TransactionResponseDTO> response = transactionService.findAllTransactions();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<TransactionResponseDTO>> getTransactions(
+            @RequestParam(required = false) TransactionType type,
+            @RequestParam(required = false) UUID categoryId,
+                @RequestParam(required = false) LocalDate initialDate,
+            @RequestParam(required = false) LocalDate finalDate
+    ) {
+        return ResponseEntity.ok(
+                transactionService.findTransactions(type, categoryId, initialDate, finalDate)
+        );
     }
 
     @GetMapping("/entradas")

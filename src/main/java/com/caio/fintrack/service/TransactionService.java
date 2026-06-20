@@ -30,6 +30,16 @@ public class TransactionService {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * Registra uma transação de entrada
+     *
+     * Representa valores recebidos pelo usuário, como salário ou freelancer.
+     * Por regra de negócio, entradas não possuem categoria.
+     *
+     * @param request dados da transação de entrada
+     * @return transação criada com seus dados de resposta
+     * @throws InvalidTransactionException quando o valor ou data forem inválidos
+     */
     public TransactionResponseDTO saveIncomeTransaction(TransactionRequestDTO request) {
 
         Transaction transaction = new Transaction();
@@ -61,6 +71,16 @@ public class TransactionService {
         );
     }
 
+    /**
+     * Registra uma transação de saída.
+     *
+     * Representa gastos do usuário e deve estar obrigatoriamente vinculadas a uma categoria existente.
+     *
+     * @param request dados da transação de saída
+     * @return transação criada com categoria vinculada
+     * @throws IdNotFoundException quando a categoria informada não existir
+     * @throws InvalidTransactionException quando valor ou data forem inválidos
+     */
     public TransactionResponseDTO saveExpenseTransaction(ExpenseTransactionRequestDTO request) {
         Transaction transaction = new Transaction();
 
@@ -97,22 +117,65 @@ public class TransactionService {
         );
     }
 
-    public List<TransactionResponseDTO> findAllTransactions() {
+    /**
+     * Consulta o extrato financeiro aplicando filtros opcionais
+     *
+     * Filtros aceitos:
+     * - Tipo da transação
+     * - Categoria
+     * - Data do periodo: inicial e final
+     *
+     * Caso nenhum filtro seja informado, retorna todas as transações cadastrada
+     *
+     * @param type tipo da transação: ENTRADA ou SAIDA
+     * @param categoryId identificador da categoria
+     * @param initialDate data inicial do período
+     * @param finalDate data final do período
+     * @return lista de transações encontradas
+     */
+    public List<TransactionResponseDTO> findTransactions(
+            TransactionType type,
+            UUID categoryId,
+            LocalDate initialDate,
+            LocalDate finalDate
+    ) {
+        List<Transaction> transactions;
 
-        List<Transaction> transactions = transactionRepository.findAll();
+        if (type != null && categoryId != null && initialDate != null && finalDate != null) {
+            transactions = transactionRepository.findByTypeAndCategoryIdAndDateBetween(
+                    type, categoryId, initialDate, finalDate
+            );
+        } else if (categoryId != null && initialDate != null && finalDate != null) {
+            transactions = transactionRepository.findByCategoryIdAndDateBetween(
+                    categoryId, initialDate, finalDate
+            );
+        } else if (type != null && initialDate != null && finalDate != null) {
+            transactions = transactionRepository.findByTypeAndDateBetween(
+                    type, initialDate, finalDate
+            );
+        } else if (type != null && categoryId != null) {
+            transactions = transactionRepository.findByTypeAndCategoryId(type, categoryId);
+        } else if (initialDate != null && finalDate != null) {
+            transactions = transactionRepository.findByDateBetween(initialDate, finalDate);
+        } else if (categoryId != null) {
+            transactions = transactionRepository.findByCategoryId(categoryId);
+        } else if (type != null) {
+            transactions = transactionRepository.findByType(type);
+        } else {
+            transactions = transactionRepository.findAll();
+        }
 
         return transactions.stream()
-                .map(
-                        transaction -> new TransactionResponseDTO(
-                                transaction.getId(),
-                                transaction.getType(),
-                                transaction.getAmount(),
-                                transaction.getDate(),
-                                transaction.getDescription(),
-                                toCategoryResponseDTO(transaction.getCategory()),
-                                transaction.getCreatedDate()
-                        )
-                ).collect(Collectors.toList());
+                .map(transaction -> new TransactionResponseDTO(
+                        transaction.getId(),
+                        transaction.getType(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getDescription(),
+                        toCategoryResponseDTO(transaction.getCategory()),
+                        transaction.getCreatedDate()
+                ))
+                .collect(Collectors.toList());
     }
 
     public List<TransactionResponseDTO> findTypeTransactions(TransactionType type) {
@@ -132,6 +195,21 @@ public class TransactionService {
                 .toList();
     }
 
+    /**
+     * Atualiza parcialmente uma transação existente.
+     *
+     * Apenas os campos informados no request são alterados.
+     * As regras de validação da criação são as mesmas utiizadas na atualização
+     *
+     * Regras:
+     * - Valor: quando informado, deve ser maior que zero
+     * - Data: quando informado, não pode ser futura
+     * - Entrada não pode receber categoria
+     *
+     * @param id identificador de transação
+     * @param request dados parciais para atualização
+     * @return transação atualizada
+     */
     public TransactionResponseDTO updateTransaction(UUID id, TransactionPatchDTO request) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
@@ -180,6 +258,12 @@ public class TransactionService {
         );
     }
 
+    /**
+     * Remove uma trasação existente.
+     *
+     * @param id identificador da transação
+     * @throws IdNotFoundException quando a transação não existir
+     */
     public void deleteTransactions(UUID id) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
@@ -187,6 +271,12 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
+    /**
+     * Converte uma entidade Category para CategoryResponseDTO
+     *
+     * Retorna null quando a transação não possui categoria,
+     * como as transações de entrada.
+     */
     private CategoryResponseDTO toCategoryResponseDTO(Category category) {
         if (category == null) {
             return null;
