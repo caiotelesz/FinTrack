@@ -4,6 +4,8 @@ import com.caio.fintrack.dto.request.ExpenseTransactionRequestDTO;
 import com.caio.fintrack.dto.request.TransactionPatchDTO;
 import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
+import com.caio.fintrack.dto.response.FinancialSummaryResponseDTO;
+import com.caio.fintrack.dto.response.PeriodDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
 import com.caio.fintrack.exception.IdNotFoundException;
 import com.caio.fintrack.exception.InvalidTransactionException;
@@ -12,6 +14,7 @@ import com.caio.fintrack.model.Transaction;
 import com.caio.fintrack.model.enums.TransactionType;
 import com.caio.fintrack.repository.CategoryRepository;
 import com.caio.fintrack.repository.TransactionRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -162,7 +165,9 @@ public class TransactionService {
         } else if (type != null) {
             transactions = transactionRepository.findByType(type);
         } else {
-            transactions = transactionRepository.findAll();
+            transactions = transactionRepository.findAll(
+                    Sort.by(Sort.Direction.DESC, "date")
+            );
         }
 
         return transactions.stream()
@@ -269,6 +274,64 @@ public class TransactionService {
                 .orElseThrow(IdNotFoundException::new);
 
         transactionRepository.delete(transaction);
+    }
+
+    /**
+     * Consulta o resumo financeiro de um período.
+     *
+     * O resumo é composto pelo total de entradas,
+     * total de saídas e saldo calculado no período informado.
+     *
+     * Regras:
+     * - A data inicial não pode ser maior que a data final
+     * - Apenas transações dentro do período são consideradas
+     * - As datas inicial e final são obrigatórias
+     *
+     * @param initialDate data inicial do período
+     * @param finalDate data final do período
+     * @return resumo financeiro consolidado
+     * @throws InvalidTransactionException quando o período informado for inválido
+     * @throws InvalidTransactionException datas inicial e final são obrigatórias
+     */
+    public FinancialSummaryResponseDTO financialSummary(
+            LocalDate initialDate,
+            LocalDate finalDate
+    ) {
+
+        if(initialDate == null && finalDate == null) {
+            throw new InvalidTransactionException(
+                    "As datas inicial e final são obrigatórias."
+            );
+        }
+
+        if (initialDate.isAfter(finalDate)) {
+            throw new InvalidTransactionException(
+                    "A data inicial não pode ser maior que a data final."
+            );
+        }
+
+        double totalIncome = transactionRepository.sumAmountByTypeAndDateBetween(
+                TransactionType.ENTRADA,
+                initialDate,
+                finalDate
+        );
+
+        double totalExpense = transactionRepository.sumAmountByTypeAndDateBetween(
+                TransactionType.SAIDA,
+                initialDate,
+                finalDate
+        );
+
+        double balance = totalIncome - totalExpense;
+
+        PeriodDTO period = new PeriodDTO(initialDate, finalDate);
+
+        return new FinancialSummaryResponseDTO(
+                period,
+                totalIncome,
+                totalExpense,
+                balance
+        );
     }
 
     /**

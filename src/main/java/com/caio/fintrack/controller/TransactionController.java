@@ -41,7 +41,7 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponseDTO>> getTransactions(
             @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) UUID categoryId,
-                @RequestParam(required = false) LocalDate initialDate,
+            @RequestParam(required = false) LocalDate initialDate,
             @RequestParam(required = false) LocalDate finalDate
     ) {
         return ResponseEntity.ok(
