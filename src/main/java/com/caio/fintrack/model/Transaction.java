@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transacoes")
+@Table(name = "transactions")
 public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, nullable = false, name = "idTransacao")
+    @Column(unique = true, nullable = false)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
@@ -30,10 +30,10 @@ public class Transaction {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCategoria")
+    @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "created_date")
     private LocalDateTime createdDate;
 
     @PrePersist

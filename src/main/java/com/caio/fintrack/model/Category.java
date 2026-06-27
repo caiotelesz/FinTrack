@@ -5,15 +5,15 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "categorias")
+@Table(name = "categories")
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, nullable = false, name = "idCategoria")
+    @Column(unique = true, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, name = "nome")
+    @Column(nullable = false)
     private String name;
 
     public Category() {}
