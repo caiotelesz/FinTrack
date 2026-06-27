@@ -29,8 +29,8 @@ public class CategoryService {
         Category category = new Category();
         category.setName(request.getNome());
 
-        if(categoryRepository.existsByName(category.getName())) {
-            throw new CategoryAlreadyExistsException(category.getName());
+        if(categoryRepository.existsByName(request.getNome())) {
+            throw new CategoryAlreadyExistsException(request.getNome());
         }
 
         Category savedCategory = categoryRepository.save(category);
@@ -58,8 +58,8 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
 
-        if(categoryRepository.existsByName(category.getName())) {
-            throw new CategoryAlreadyExistsException(category.getName());
+        if(categoryRepository.existsByName(request.getNome())) {
+            throw new CategoryAlreadyExistsException(request.getNome());
         }
 
         category.setName(request.getNome());
