@@ -3,6 +3,7 @@ package com.caio.fintrack.controller;
 import com.caio.fintrack.dto.request.CategoryRequestDTO;
 import com.caio.fintrack.dto.response.CategoryResponseDTO;
 import com.caio.fintrack.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponseDTO> saveCategory(@RequestBody CategoryRequestDTO request) {
+    public ResponseEntity<CategoryResponseDTO> saveCategory(@RequestBody @Valid CategoryRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(categoryService.saveCategory(request));
     }
@@ -35,7 +36,7 @@ public class CategoryController {
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(
             @PathVariable UUID id,
-            @RequestBody CategoryRequestDTO request
+            @RequestBody @Valid CategoryRequestDTO request
     ) {
         CategoryResponseDTO response = categoryService.updateCategory(id, request);
         return ResponseEntity.ok(response);

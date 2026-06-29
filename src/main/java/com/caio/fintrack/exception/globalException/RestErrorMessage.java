@@ -1,7 +1,5 @@
 package com.caio.fintrack.exception.globalException;
 
-import org.springframework.http.HttpStatus;
-
 public class RestErrorMessage {
 
     private String title;

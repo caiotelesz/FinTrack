@@ -6,6 +6,7 @@ import com.caio.fintrack.dto.request.TransactionRequestDTO;
 import com.caio.fintrack.dto.response.TransactionResponseDTO;
 import com.caio.fintrack.model.enums.TransactionType;
 import com.caio.fintrack.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,13 +27,13 @@ public class TransactionController {
     }
 
     @PostMapping("/entradas")
-    public ResponseEntity<TransactionResponseDTO> createTransaction(@RequestBody TransactionRequestDTO request) {
+    public ResponseEntity<TransactionResponseDTO> createTransaction(@RequestBody @Valid TransactionRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(transactionService.saveIncomeTransaction(request));
     }
 
     @PostMapping("/saidas")
-    public ResponseEntity<TransactionResponseDTO> saveTransaction(@RequestBody ExpenseTransactionRequestDTO request) {
+    public ResponseEntity<TransactionResponseDTO> saveTransaction(@RequestBody @Valid ExpenseTransactionRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(transactionService.saveExpenseTransaction(request));
     }
@@ -64,7 +65,7 @@ public class TransactionController {
     @PatchMapping("/{id}")
     public ResponseEntity<TransactionResponseDTO> updateTransaction(
             @PathVariable UUID id,
-            @RequestBody TransactionPatchDTO request
+            @RequestBody @Valid TransactionPatchDTO request
     ) {
         TransactionResponseDTO response = transactionService.updateTransaction(id, request);
         return ResponseEntity.ok(response);

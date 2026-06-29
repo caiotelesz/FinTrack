@@ -6,12 +6,13 @@ import com.caio.fintrack.exception.CategoryAlreadyExistsException;
 import com.caio.fintrack.exception.InvalidTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler {
 
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     private ResponseEntity<RestErrorMessage> existsNameException(CategoryAlreadyExistsException exception) {
@@ -50,5 +51,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 exception.getMessage()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(threatResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    private ResponseEntity<RestErrorMessage> methodArgumentNotValidException(
+            MethodArgumentNotValidException exception
+    ) {
+
+        String message = exception.getBindingResult()
+                .getFieldError()
+                .getDefaultMessage();
+
+        RestErrorMessage response = new RestErrorMessage(
+                "Dados inválidos",
+                HttpStatus.BAD_REQUEST.value(),
+                message
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 }
